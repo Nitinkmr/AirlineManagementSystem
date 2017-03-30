@@ -1,0 +1,27 @@
+
+<div class="container">
+  <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        </div>
+        <table class="table table-fixed">
+         
+          <tbody>
+
+            {% for flight in flights%}
+              <tr>
+               <td class="col-xs-8">{{flight.rate}}</td>  
+               <td class="col-xs-8">{{flight.arrivalTime}}</td>
+               <td class="col-xs-8">{{flight.departureTime}}</td>
+               <td class="col-xs-8">{{flight.duration}}</td>
+             
+
+              </tr>
+            {% endfor %}
+
+            
+          </tbody>
+        </table>
+      </div>
+  </div>
+</div>
