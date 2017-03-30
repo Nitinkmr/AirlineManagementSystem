@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from models import Passenger
+from models import Passenger,Flights
 from Airports import get_airports
 import datetime
 
@@ -10,7 +10,7 @@ class PassengerForm(ModelForm):
          model = Passenger
          fields = ['FirstName','LastName','Sex','Age','PhoneNumber','Email']
 
-class FromAndToForm(forms.Form):
+class SelectFlight(forms.Form):
 
 	Airports = get_airports()
 	choices = [(Airport['iata'],Airport['name']) for Airport in Airports]
@@ -19,5 +19,9 @@ class FromAndToForm(forms.Form):
 	Date = forms.DateField(initial=datetime.date.today)
 	
 
+class Flights(ModelForm):
 	
+	class Meta:
+		model = Flights
+		fields = ['origin','destination','date','flightNum','price','arrivalTime','departureTime']
 	

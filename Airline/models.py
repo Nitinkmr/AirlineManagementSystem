@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator,validate_email
 from random import randint
+import datetime
 # Create your models here.
 
 
@@ -55,3 +56,16 @@ class Ticket(models.Model):
 	PNR = models.ForeignKey(Booking)
 	price = models.IntegerField(default=randint(1,1000))
 
+class Flights(models.Model):	
+
+	origin = models.CharField(max_length=50,blank=False)
+	destination = models.CharField(max_length=50,blank=False)
+	date = models.DateField(_("Date"),blank=False)
+	flightNum = models.CharField(max_length=50,blank=False,unique=True)
+	price = models.CharField(max_length=10,blank=False)
+	arrivalTime = models.CharField(max_length=10,blank=False)
+	departureTime = models.CharField(max_length=10,blank=False)
+	
+	class Admin: 
+
+	 	pass

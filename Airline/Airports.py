@@ -42577,7 +42577,7 @@ airports = [
         "size": "medium"
     },
     {
-        "iata": "HDD",
+        "iata": "HYD",
         "lon": "68.36389",
         "iso": "PK",
         "status": 1,
