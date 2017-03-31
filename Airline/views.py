@@ -55,7 +55,7 @@ def FromAndTo(request):
 				request.session['destination'] = ToAirport
 				request.session['date'] = Date.strftime("%Y-%m-%d")
 			except Exception as e:
-				print e
+				print(e)
 
 			return HttpResponseRedirect('/airline/displayFlights') 
 
@@ -134,7 +134,7 @@ def displayFlights(request):
 	return render(request, 'displayFlights.html', {'flights': result})
 	
 def displaySelectedFlight(request,flightNum):
-	print flightNum
+	#print flightNum
 	flight = Flights.objects.all().filter(flightNum=flightNum)
 	result = {
 				"rate": flight[0].price,
