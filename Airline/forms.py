@@ -8,7 +8,7 @@ class PassengerForm(ModelForm):
 
      class Meta:
          model = Passenger
-         fields = ['FirstName','LastName','Sex','Age','PhoneNumber','Email']
+         fields = ['PhoneNumber','Email','FirstName','LastName','Sex','Age']
 
 class SelectFlight(forms.Form):
 

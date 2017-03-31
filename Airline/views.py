@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from forms import PassengerForm,SelectFlight
-from models import Flights
+from models import Flights,Ticket,Passenger,Booking,IssuedFor
 import json
 import requests
 import datetime
 from django.contrib import messages
 from django.contrib.messages import get_messages
+from django.utils.crypto import get_random_string
 # Create your views here.
 
 api_key = "AIzaSyCa1Oko5VirJeqaSpC7GXGeFTU5vBzS5a8"
@@ -15,15 +16,29 @@ headers = {'content-type': 'application/json'}
 
 def PassengerDetails(request):
 
-	if request.method == 'POST':
+	print request.method
+	if request.method == "POST":
 		form = PassengerForm(request.POST)
-		if form.is_valid():
-			instance = form.save(commit=False)
-			instance.save()
+		print form.is_valid()
+		if True:#form.is_valid():
+			formData = form.cleaned_data
+			print formData
+			
+			print formData["PhoneNumber"]
+			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
+			print formData
+			print formData["PhoneNumber"]
+			request.session["phoneNumber"] = formData["PhoneNumber"]
+			
+			if count == 0:	
+				instance = form.save(commit=False)
+				instance.save()
+
+			return HttpResponseRedirect('/airline/displayTicket') 
 	else:
 		form = PassengerForm()
 
-	return render(request, 'index.html', {'form': form})
+	return render(request, 'passengerDetails.html', {'form': form})
 
 def FromAndTo(request):
 
@@ -127,5 +142,32 @@ def displaySelectedFlight(request,flightNum):
 				"arrivalTime":flight[0].arrivalTime,
 				"flightNum":flight[0].flightNum		
 	}
+	request.session['flightNum'] = flightNum
 	return render(request, 'displaySelectedFlight.html', {'flight': result})
+	
+def ticket(request):
+
+	flightNum = request.session.get('flightNum')
+	flight =  Flights.objects.all().filter(flightNum=flightNum)
+	pnr = get_random_string(length=6).upper()
+	
+	
+	try:
+		#save ticket#
+		newTicket = Ticket(PNR=pnr,price=flight[0].price)
+		newTicket.save()
+
+		passenger = Passenger.objects.all().filter(PhoneNumber=request.session.get("phoneNumber"))
+		
+		#save booking# 
+		form = Booking(PNR=pnr,PhoneNumber=passenger[0])
+		form.save()
+
+		#save IssuedFor#
+	
+		form = IssuedFor(PNR=newTicket,flightNum=flight[0])
+		form.save()
+	except Exception as e:
+		print e
+	return render(request, 'displayTicket.html', {'flightNum': flightNum,'pnr':pnr,'price':flight[0].price})
 	
