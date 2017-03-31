@@ -19,7 +19,7 @@ def PassengerDetails(request):
 	#print request.method
 	if request.method == "POST":
 		form = PassengerForm(request.POST)
-		print form.is_valid()
+		#print form.is_valid()
 		if True:#form.is_valid():
 			formData = form.cleaned_data
 	#		print formData
