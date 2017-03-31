@@ -16,18 +16,18 @@ headers = {'content-type': 'application/json'}
 
 def PassengerDetails(request):
 
-	print request.method
+	#print request.method
 	if request.method == "POST":
 		form = PassengerForm(request.POST)
 		print form.is_valid()
 		if True:#form.is_valid():
 			formData = form.cleaned_data
-			print formData
+	#		print formData
 			
-			print formData["PhoneNumber"]
+	#		print formData["PhoneNumber"]
 			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
-			print formData
-			print formData["PhoneNumber"]
+	#		print formData
+	#		print formData["PhoneNumber"]
 			request.session["phoneNumber"] = formData["PhoneNumber"]
 			
 			if count == 0:	
@@ -77,7 +77,7 @@ def displayFlights(request):
 	if len(flights)>0:
 		
 		# flight found in DB
-		print "flights from DB"
+	#	print "flights from DB"
 		result = []
 		for flight in flights:
 			temp = {
@@ -129,8 +129,8 @@ def displayFlights(request):
 				new_flight.save()
 				result.append(temp)
 			except Exception as e:
-				print e
-		print result
+				print(e)
+	#	print result
 	return render(request, 'displayFlights.html', {'flights': result})
 	
 def displaySelectedFlight(request,flightNum):
@@ -168,6 +168,6 @@ def ticket(request):
 		form = IssuedFor(PNR=newTicket,flightNum=flight[0])
 		form.save()
 	except Exception as e:
-		print e
+		print(e)
 	return render(request, 'displayTicket.html', {'flightNum': flightNum,'pnr':pnr,'price':flight[0].price})
 	
