@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from forms import PassengerForm,SelectFlight
-from models import Flights,Ticket,Passenger,Booking,IssuedFor
+from .forms import PassengerForm,SelectFlight
+from .models import Flights,Ticket,Passenger,Booking,IssuedFor
 import json
 import requests
 import datetime
