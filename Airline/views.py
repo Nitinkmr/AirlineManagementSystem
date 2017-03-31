@@ -28,7 +28,6 @@ def PassengerDetails(request):
 def FromAndTo(request):
 
 	if request.method == "POST":
-		print "Post"
 		form = SelectFlight(request.POST)
 		if form.is_valid():			
 			data = form.cleaned_data
@@ -36,8 +35,6 @@ def FromAndTo(request):
 			ToAirport = data['ToAirport']
 			Date = data['Date']
 			 
-
-		
 			try:
 				request.session['origin'] = FromAirport
 				request.session['destination'] = ToAirport
@@ -63,6 +60,8 @@ def displayFlights(request):
 
 	flights = Flights.objects.all().filter(origin=origin,destination=destination,date=date)
 	if len(flights)>0:
+		
+		# flight found in DB
 		print "flights from DB"
 		result = []
 		for flight in flights:
@@ -101,8 +100,7 @@ def displayFlights(request):
 		flights = flights["trips"]["tripOption"]
 		#print flights
 		result = []
-		origin = str(origin)
-		print origin
+		
 		for flight in flights:
 			temp = {
 					"rate": flight['saleTotal'],
@@ -111,10 +109,23 @@ def displayFlights(request):
 					"flightNum":flight['slice'][0]['segment'][0]['flight']['number']
 			}
 
-			new_flight = Flights(origin=request.session.get('origin'),destination=request.session.get('destination'),date=request.session.get('date'),flightNum=temp['flightNum'],price=temp['rate'],arrivalTime=temp['arrivalTime'],departureTime = temp['departureTime'])
-			new_flight.save()
-			result.append(temp)
-		
+			try:
+				new_flight = Flights(origin=request.session.get('origin'),destination=request.session.get('destination'),date=request.session.get('date'),flightNum=temp['flightNum'],price=temp['rate'],arrivalTime=temp['arrivalTime'],departureTime = temp['departureTime'])
+				new_flight.save()
+				result.append(temp)
+			except Exception as e:
+				print e
 		print result
 	return render(request, 'displayFlights.html', {'flights': result})
+	
+def displaySelectedFlight(request,flightNum):
+	print flightNum
+	flight = Flights.objects.all().filter(flightNum=flightNum)
+	result = {
+				"rate": flight[0].price,
+				"departureTime":flight[0].departureTime,
+				"arrivalTime":flight[0].arrivalTime,
+				"flightNum":flight[0].flightNum		
+	}
+	return render(request, 'displaySelectedFlight.html', {'flight': result})
 	
