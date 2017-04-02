@@ -8,6 +8,8 @@ urlpatterns = [
     
     url(r'^/?$', views.FromAndTo),
     url(r'^displayFlights?$', views.displayFlights),
+    url(r'^([0-9]{1})/$', views.displaySelectedFlight),
+    url(r'^([0-9]{2})/$', views.displaySelectedFlight),
     url(r'^([0-9]{3})/$', views.displaySelectedFlight),
     url(r'^([0-9]{4})/$', views.displaySelectedFlight),
     url(r'^([0-9]{5})/$', views.displaySelectedFlight),

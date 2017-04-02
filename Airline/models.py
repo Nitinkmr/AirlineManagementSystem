@@ -18,11 +18,40 @@ def validate_age(age):
     )
 
 def verify_email(email):
-	if not validate_email(email):
+	try:
+	    validate_email(email)
+	except ValidationError as e:
 		raise ValidationError(
-           _('invalid email : %(email)s'),
+           _('invalid Email'),
            params={'value': email},
-       )
+    )
+	else:
+	    print "hooray! email is valid"
+		
+	
+
+def verifyPhoneNo(phoneNo):
+
+	condition = (len(phoneNo)<10)
+
+	if len(phoneNo)!= 10:
+		raise ValidationError(
+           _('invalid Phone Number'),
+           params={'value': phoneNo},
+    )
+
+def validateName(name):
+	try:
+	    validate_username(name)
+	except ValidationError as e:
+		raise ValidationError(
+           _('invalid name'),
+           params={'value': name},
+    )
+	else:
+	    print "hooray! email is valid"
+		
+
 
 class Passenger(models.Model):
 	
@@ -30,17 +59,25 @@ class Passenger(models.Model):
 			("F","Female"),
 			("O","Other")]
 
-	Email = models.CharField(max_length=30,blank=False,unique=True)
+	Email = models.CharField(max_length=30,blank=False,validators=[verify_email])
 	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-	PhoneNumber = models.CharField(max_length=10,validators=[phone_regex], blank=False)#,unique=True) 
+
+	'''
+	The unique constraint for PhoneNumber is implemented by some checking if a user exists with the provided 
+	phone number in our DB.
+
+	'''
+
+	PhoneNumber = models.CharField(max_length=10,validators=[phone_regex],blank=False) 
+	
+	'''
+	add validation to first and last name
+	'''
 	FirstName = models.CharField(max_length=30,blank=False)
 	LastName = models.CharField(max_length=30,blank=True)
 	Sex = models.CharField(max_length=1,choices=SEX,blank=True)
 	Age = models.IntegerField(validators=[validate_age],blank=False)
 	
-	'''
-	add Email validator either in front-end or here
-	'''
 	
 
 	class Admin: 

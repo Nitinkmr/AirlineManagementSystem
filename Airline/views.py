@@ -19,8 +19,10 @@ def PassengerDetails(request):
 	#print request.method
 	if request.method == "POST":
 		form = PassengerForm(request.POST)
-		print form
-		if True:#form.is_valid():
+		print "form"
+		print form.is_valid()
+
+		if form.is_valid():
 			formData = form.cleaned_data
 			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
 			request.session["phoneNumber"] = formData["PhoneNumber"]
@@ -39,6 +41,8 @@ def FromAndTo(request):
 
 	if request.method == "POST":
 		form = SelectFlight(request.POST)
+		print "form"
+		print form.is_valid()
 		if form.is_valid():			
 			data = form.cleaned_data
 			FromAirport = data['origin']
@@ -53,6 +57,8 @@ def FromAndTo(request):
 				print(e)
 
 			return HttpResponseRedirect('/airline/displayFlights') 
+		
+
 
 	else:
 		form = SelectFlight()
@@ -105,7 +111,15 @@ def displayFlights(request):
 		
 		flights = data
 		flights = json.loads(flights)
-		flights = flights["trips"]["tripOption"]
+		print flights
+		flights = flights["trips"]
+		print flights
+		if 'tripOption' in flights:
+			flights = flights["tripOption"]	
+		else:
+			print "flights dont exist"			
+			return render(request, 'displayFlights.html', {'error': "no flights scheduled fot the given specification",'flights':''})
+		
 		#print flights
 		result = []
 		
