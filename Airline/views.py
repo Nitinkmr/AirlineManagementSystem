@@ -46,8 +46,8 @@ def FromAndTo(request):
 		form = SelectFlight(request.POST)
 		if form.is_valid():			
 			data = form.cleaned_data
-			FromAirport = data['FromAirport']
-			ToAirport = data['ToAirport']
+			FromAirport = data['origin']
+			ToAirport = data['destination']
 			Date = data['Date']
 			 
 			try:
@@ -61,6 +61,7 @@ def FromAndTo(request):
 
 	else:
 		form = SelectFlight()
+		print form
 
 	return render(request, 'index.html', {'form': form})
 
@@ -112,7 +113,12 @@ def displayFlights(request):
 		
 		flights = data
 		flights = json.loads(flights)
-		flights = flights["trips"]["tripOption"]
+		flights = flights["trips"]
+		if "tripOption" in flights:
+			flights = flights["tripOption"]
+		else:
+			result = []
+			return render(request, 'displayFlights.html', {'error': 'No flights found',"flights":result})
 		#print flights
 		result = []
 		
@@ -131,7 +137,7 @@ def displayFlights(request):
 			except Exception as e:
 				print e
 		print result
-	return render(request, 'displayFlights.html', {'flights': result})
+	return render(request, 'displayFlights.html', {'error':'','flights': result})
 	
 def displaySelectedFlight(request,flightNum):
 	print flightNum

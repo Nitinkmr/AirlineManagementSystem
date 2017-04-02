@@ -4,11 +4,19 @@
 <head>
 	<title>Airlines</title>
 <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.min.css  "%}"> 	
+<style type="text/css">
+
+.my_form{
+	padding-top: 15%
+}	
+
+
+</style>
+
 </head>
 
 <body>
-
-<div class="dropdown">
+<div class="my_form">
 <form action="" method="post">
     {% csrf_token %}
     {{ form }}

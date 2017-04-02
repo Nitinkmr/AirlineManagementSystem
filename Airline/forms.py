@@ -14,8 +14,8 @@ class SelectFlight(forms.Form):
 
 	Airports = get_airports()
 	choices = [(Airport['iata'],Airport['name']) for Airport in Airports]
-	FromAirport = forms.ChoiceField(choices)
-	ToAirport = forms.ChoiceField(choices)
+	origin = forms.ChoiceField(choices)
+	destination = forms.ChoiceField(choices)
 	Date = forms.DateField(initial=datetime.date.today)
 	
 
