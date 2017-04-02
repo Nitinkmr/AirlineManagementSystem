@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django import forms
-from models import Passenger,Flights
-from Airports import get_airports
+from .models import Passenger,Flights
+from .Airports import get_airports
 import datetime
 
 class PassengerForm(ModelForm):

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from forms import PassengerForm,SelectFlight
-from models import Flights,Ticket,Passenger,Booking,IssuedFor
+from .forms import PassengerForm,SelectFlight
+from .models import Flights,Ticket,Passenger,Booking,IssuedFor
 import json
 import requests
 import datetime
@@ -16,18 +16,18 @@ headers = {'content-type': 'application/json'}
 
 def PassengerDetails(request):
 
-	print request.method
+	#print request.method
 	if request.method == "POST":
 		form = PassengerForm(request.POST)
-		print form.is_valid()
+		#print form.is_valid()
 		if True:#form.is_valid():
 			formData = form.cleaned_data
-			print formData
+	#		print formData
 			
-			print formData["PhoneNumber"]
+	#		print formData["PhoneNumber"]
 			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
-			print formData
-			print formData["PhoneNumber"]
+	#		print formData
+	#		print formData["PhoneNumber"]
 			request.session["phoneNumber"] = formData["PhoneNumber"]
 			
 			if count == 0:	
@@ -46,8 +46,8 @@ def FromAndTo(request):
 		form = SelectFlight(request.POST)
 		if form.is_valid():			
 			data = form.cleaned_data
-			FromAirport = data['origin']
-			ToAirport = data['destination']
+			FromAirport = data['FromAirport']
+			ToAirport = data['ToAirport']
 			Date = data['Date']
 			 
 			try:
@@ -55,13 +55,12 @@ def FromAndTo(request):
 				request.session['destination'] = ToAirport
 				request.session['date'] = Date.strftime("%Y-%m-%d")
 			except Exception as e:
-				print e
+				print(e)
 
 			return HttpResponseRedirect('/airline/displayFlights') 
 
 	else:
 		form = SelectFlight()
-		print form
 
 	return render(request, 'index.html', {'form': form})
 
@@ -78,7 +77,7 @@ def displayFlights(request):
 	if len(flights)>0:
 		
 		# flight found in DB
-		print "flights from DB"
+	#	print "flights from DB"
 		result = []
 		for flight in flights:
 			temp = {
@@ -113,12 +112,7 @@ def displayFlights(request):
 		
 		flights = data
 		flights = json.loads(flights)
-		flights = flights["trips"]
-		if "tripOption" in flights:
-			flights = flights["tripOption"]
-		else:
-			result = []
-			return render(request, 'displayFlights.html', {'error': 'No flights found',"flights":result})
+		flights = flights["trips"]["tripOption"]
 		#print flights
 		result = []
 		
@@ -135,12 +129,12 @@ def displayFlights(request):
 				new_flight.save()
 				result.append(temp)
 			except Exception as e:
-				print e
-		print result
-	return render(request, 'displayFlights.html', {'error':'','flights': result})
+				print(e)
+	#	print result
+	return render(request, 'displayFlights.html', {'flights': result})
 	
 def displaySelectedFlight(request,flightNum):
-	print flightNum
+	#print flightNum
 	flight = Flights.objects.all().filter(flightNum=flightNum)
 	result = {
 				"rate": flight[0].price,
@@ -174,6 +168,6 @@ def ticket(request):
 		form = IssuedFor(PNR=newTicket,flightNum=flight[0])
 		form.save()
 	except Exception as e:
-		print e
+		print(e)
 	return render(request, 'displayTicket.html', {'flightNum': flightNum,'pnr':pnr,'price':flight[0].price})
 	
