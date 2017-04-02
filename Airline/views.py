@@ -19,12 +19,9 @@ def PassengerDetails(request):
 	#print request.method
 	if request.method == "POST":
 		form = PassengerForm(request.POST)
-		#print form.is_valid()
+		print form
 		if True:#form.is_valid():
 			formData = form.cleaned_data
-	#		print formData
-			
-	#		print formData["PhoneNumber"]
 			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
 	#		print formData
 	#		print formData["PhoneNumber"]
@@ -46,8 +43,8 @@ def FromAndTo(request):
 		form = SelectFlight(request.POST)
 		if form.is_valid():			
 			data = form.cleaned_data
-			FromAirport = data['FromAirport']
-			ToAirport = data['ToAirport']
+			FromAirport = data['origin']
+			ToAirport = data['destination']
 			Date = data['Date']
 			 
 			try:
