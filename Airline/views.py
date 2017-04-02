@@ -23,8 +23,6 @@ def PassengerDetails(request):
 		if True:#form.is_valid():
 			formData = form.cleaned_data
 			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
-	#		print formData
-	#		print formData["PhoneNumber"]
 			request.session["phoneNumber"] = formData["PhoneNumber"]
 			
 			if count == 0:	
@@ -73,8 +71,6 @@ def displayFlights(request):
 	flights = Flights.objects.all().filter(origin=origin,destination=destination,date=date)
 	if len(flights)>0:
 		
-		# flight found in DB
-	#	print "flights from DB"
 		result = []
 		for flight in flights:
 			temp = {
@@ -127,7 +123,6 @@ def displayFlights(request):
 				result.append(temp)
 			except Exception as e:
 				print(e)
-	#	print result
 	return render(request, 'displayFlights.html', {'flights': result})
 	
 def displaySelectedFlight(request,flightNum):
