@@ -7,16 +7,23 @@ from django.core.validators import RegexValidator,validate_email
 from random import randint
 import datetime
 from django.utils.crypto import get_random_string
+import re
 # Create your models here.
 
 
 def validate_age(age):
-	if age <= 0:
+	if age <= 3 and age>=0:
 		raise ValidationError(
-           _('invalid age'),
+           _('Ticket not required for this age range'),
            params={'value': age},
     )
 
+
+	if age<0:
+		raise ValidationError(
+           _('Invalid age'),
+           params={'value': age},
+    )
 def verify_email(email):
 	try:
 	    validate_email(email)
@@ -41,17 +48,32 @@ def verifyPhoneNo(phoneNo):
     )
 
 def validateName(name):
-	try:
-	    validate_username(name)
-	except ValidationError as e:
+	
+	condition = bool(re.match("^[a-zA-Z]+$", name))
+	
+	
+	'''
+	^ : start of string
+	[ : beginning of character group
+	a-z : any lowercase letter
+	A-Z : any uppercase letter
+	0-9 : any digit
+	_ : underscore
+	] : end of character group
+	+ : one or more of the given characters - this will not allow empty string
+	$ : end of string
+
+	'''
+	if not condition:
 		raise ValidationError(
            _('invalid name'),
            params={'value': name},
     )
-	else:
-	    print "hooray! email is valid"
-		
 
+
+class Ticket(models.Model):
+	PNR =  models.CharField(max_length=6,default=get_random_string(length=6),blank=True)
+	price = models.CharField(max_length=10,default=randint(1,1000),blank=False)
 
 class Passenger(models.Model):
 	
@@ -60,7 +82,7 @@ class Passenger(models.Model):
 			("O","Other")]
 
 	Email = models.CharField(max_length=30,blank=False,validators=[verify_email])
-	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be of 10 digits")
 
 	'''
 	The unique constraint for PhoneNumber is implemented by some checking if a user exists with the provided 
@@ -73,26 +95,17 @@ class Passenger(models.Model):
 	'''
 	add validation to first and last name
 	'''
-	FirstName = models.CharField(max_length=30,blank=False)
-	LastName = models.CharField(max_length=30,blank=True)
+	FirstName = models.CharField(max_length=30,blank=False,validators=[validateName])
+	LastName = models.CharField(max_length=30,blank=True,validators=[validateName])
 	Sex = models.CharField(max_length=1,choices=SEX,blank=True)
 	Age = models.IntegerField(validators=[validate_age],blank=False)
+	pnrNo = models.ForeignKey(Ticket,unique=False)
 	
-	
-
-	class Admin: 
-
-	 	pass
-
 
 class Booking(models.Model):
 
-	PhoneNumber = models.ForeignKey(Passenger)
-	PNR = models.CharField(max_length=6,blank=False,default=randint(100000,999999),unique=True)
-
-class Ticket(models.Model):
-	PNR =  models.CharField(max_length=6,default=get_random_string(length=6),blank=True)
-	price = models.CharField(max_length=10,default=randint(1,1000),blank=False)
+	PNR = models.ForeignKey(Ticket)
+	#PNR = models.CharField(max_length=6,blank=False,default=randint(100000,999999),unique=True)
 
 class Flights(models.Model):	
 
@@ -104,9 +117,7 @@ class Flights(models.Model):
 	arrivalTime = models.CharField(max_length=10,blank=False)
 	departureTime = models.CharField(max_length=10,blank=False)
 	
-	class Admin: 
 
-	 	pass
 
 class Aircraft(models.Model):
 	modelNo = models.CharField(max_length=15,default="Airbus A320",blank=True)

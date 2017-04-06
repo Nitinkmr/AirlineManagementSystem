@@ -24,13 +24,9 @@ def PassengerDetails(request):
 
 		if form.is_valid():
 			formData = form.cleaned_data
-			count = Passenger.objects.all().filter(PhoneNumber=formData["PhoneNumber"]).count()
 			request.session["phoneNumber"] = formData["PhoneNumber"]
-			
-			if count == 0:	
-				instance = form.save(commit=False)
-				instance.save()
-
+			request.session["passengerForm"] = formData
+		
 			return HttpResponseRedirect('/airline/displayTicket') 
 	else:
 		form = PassengerForm()
@@ -154,6 +150,7 @@ def displaySelectedFlight(request,flightNum):
 def ticket(request):
 
 	flightNum = request.session.get('flightNum')
+	passengerForm = request.session.get('passengerForm')
 	flight =  Flights.objects.all().filter(flightNum=flightNum)
 	pnr = get_random_string(length=6).upper()
 	
@@ -163,16 +160,30 @@ def ticket(request):
 		newTicket = Ticket(PNR=pnr,price=flight[0].price)
 		newTicket.save()
 
-		passenger = Passenger.objects.all().filter(PhoneNumber=request.session.get("phoneNumber"))
-		
-		#save booking# 
-		form = Booking(PNR=pnr,PhoneNumber=passenger[0])
-		form.save()
-
 		#save IssuedFor#
 	
 		form = IssuedFor(PNR=newTicket,flightNum=flight[0])
 		form.save()
+		#passenger = Passenger.objects.all().filter(PhoneNumber=request.session.get("phoneNumber"))
+
+			#save booking# 
+		form = Booking(PNR=newTicket)
+		form.save()
+		#save passenger#
+		age = passengerForm["Age"]
+		sex = passengerForm["Sex"]
+		firstName = passengerForm["FirstName"]
+		lastName = passengerForm["LastName"]
+		phoneNumber = passengerForm["PhoneNumber"]
+		email = passengerForm["Email"]
+
+		newPassenger = Passenger(Email=email,PhoneNumber=phoneNumber,FirstName=firstName,LastName=lastName,Sex=sex,Age=age,pnrNo=newTicket)	
+		newPassenger.save()
+			
+		
+	
+
+		
 	except Exception as e:
 		print(e)
 	return render(request, 'displayTicket.html', {'flightNum': flightNum,'pnr':pnr,'price':flight[0].price})

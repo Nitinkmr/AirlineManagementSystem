@@ -9,6 +9,10 @@ import datetime
 
 def validateDate(datePassed):
 
+	if (datePassed.month >= (datetime.date.today().month+6)) :
+		raise forms.ValidationError("Bookings can not be done for dates 6 months beyind the current date")
+
+
 	if (datePassed<datetime.date.today()):
 		raise forms.ValidationError("Invalid date")
 
