@@ -112,12 +112,14 @@ class Flights(models.Model):
 	origin = models.CharField(max_length=50,blank=False)
 	destination = models.CharField(max_length=50,blank=False)
 	date = models.DateField(_("Date"),blank=False)
-	flightNum = models.CharField(max_length=50,blank=False,unique=True)
+	flightNum = models.CharField(max_length=50,blank=False)
 	price = models.CharField(max_length=10,blank=False)
 	arrivalTime = models.CharField(max_length=10,blank=False)
 	departureTime = models.CharField(max_length=10,blank=False)
-	
+	seatsAvailable = models.IntegerField(default=180)
 
+	class Meta:
+		unique_together = (("flightNum","date"))
 
 class Aircraft(models.Model):
 	modelNo = models.CharField(max_length=15,default="Airbus A320",blank=True)
@@ -125,11 +127,12 @@ class Aircraft(models.Model):
 	registrationNumber = models.CharField(max_length=6,default=randint(1000,999999),blank=True,unique=True)
 
 class OperatedBy(models.Model):
-	flightNum = models.ForeignKey(Flights)
+	flightNum = models.ForeignKey(Flights,related_name='Airline_Flights_flightNum')
 	registrationNumber = models.ForeignKey(Aircraft)
+	dt = models.ForeignKey(Flights,blank=False,related_name='Airline_Flights_date')
 
 	class Meta:
-		unique_together = (("flightNum","registrationNumber"))
+		unique_together = (("flightNum","dt"))
 
 class IssuedFor(models.Model):
 	PNR = models.ForeignKey(Ticket,unique=True)

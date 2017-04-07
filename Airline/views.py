@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .forms import PassengerForm,SelectFlight,getNumPassengers
-from .models import Flights,Ticket,Passenger,Booking,IssuedFor
+from .models import Flights,Ticket,Passenger,Booking,IssuedFor,Aircraft,OperatedBy
 import json
 import requests
 import datetime
@@ -15,6 +15,7 @@ url = "https://www.googleapis.com/qpxExpress/v1/trips/search?key=" + api_key
 headers = {'content-type': 'application/json'}
 global users 
 users = None
+
 def PassengerDetails(request,numPassengers):
 
 	#print request.method
@@ -122,7 +123,7 @@ def displayFlights(request):
 			    "passengers": {
 			      "adultCount": 1
 			    },
-			    "solutions": 20,
+			    "solutions": 5,
 			    "refundable": False
 			  }
 			}
@@ -131,6 +132,8 @@ def displayFlights(request):
 		data = response.json()
 		data = json.dumps(data)
 		
+
+
 		flights = data
 		flights = json.loads(flights)
 		print flights
@@ -142,9 +145,12 @@ def displayFlights(request):
 			print "flights dont exist"			
 			return render(request, 'displayFlights.html', {'error': "no flights scheduled fot the given specification",'flights':''})
 		
+
+
 		#print flights
 		result = []
-		
+		aircrafts = Aircraft.objects.all()
+		x = 0
 		for flight in flights:
 			temp = {
 					"rate": flight['saleTotal'],
@@ -154,11 +160,17 @@ def displayFlights(request):
 			}
 
 			try:
+				
 				new_flight = Flights(origin=request.session.get('origin'),destination=request.session.get('destination'),date=request.session.get('date'),flightNum=temp['flightNum'],price=temp['rate'],arrivalTime=temp['arrivalTime'],departureTime = temp['departureTime'])
 				new_flight.save()
 				result.append(temp)
+				
+				form = OperatedBy(flightNum=new_flight,registrationNumber=aircrafts[x],dt=new_flight)
+				form.save()
+				x = x+1
 			except Exception as e:
 				print(e)
+	
 	return render(request, 'displayFlights.html', {'flights': result})
 	
 def displaySelectedFlight(request,flightNum):
