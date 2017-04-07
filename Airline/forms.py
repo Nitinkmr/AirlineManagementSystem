@@ -38,3 +38,8 @@ class Flights(ModelForm):
 		model = Flights
 		fields = ['origin','destination','date','flightNum','price','arrivalTime','departureTime']
 	
+class getNumPassengers(forms.Form):
+
+	choices = [(x,x) for x in range(1,5)]
+	numOfPassengers = forms.ChoiceField(choices)
+	
