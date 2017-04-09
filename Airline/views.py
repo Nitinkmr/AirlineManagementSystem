@@ -126,7 +126,7 @@ def displayFlights(request):
 			    "passengers": {
 			      "adultCount": 1
 			    },
-			    "solutions": 1,
+			    "solutions": 20,
 			    "refundable": False
 			  }
 			}
@@ -159,7 +159,7 @@ def displayFlights(request):
 					"rate": flight['saleTotal'],
 					"departureTime":flight['slice'][0]['segment'][0]['leg'][0]['departureTime'],
 					"arrivalTime":flight['slice'][0]['segment'][0]['leg'][0]['arrivalTime'],
-					"flightNum":flight['slice'][0]['segment'][0]['flight']['number']
+					"flightNum":flight['slice'][0]['segment'][0]['flight']['carrier'] + flight['slice'][0]['segment'][0]['flight']['number']
 			}
 
 			try:

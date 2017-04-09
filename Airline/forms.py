@@ -25,8 +25,14 @@ class PassengerForm(ModelForm):
 class SelectFlight(forms.Form):
 
 	Airports = get_airports()
-	choices = [(Airport['iata'],Airport['name']) for Airport in Airports]
+	choices = []
 	
+	for Airport in Airports:
+		if Airport["country"] == "India" and Airport['name'] !='':
+			choices.append((Airport['code'],Airport['name']))
+	#choices = [(Airport['iata'],Airport['name']) for Airport in Airports]
+	
+
 	origin = forms.ChoiceField(choices)
 	destination = forms.ChoiceField(choices)
 	Date = forms.DateField(initial=datetime.date.today,validators=[validateDate],widget=SelectDateWidget)
