@@ -10,11 +10,8 @@ urlpatterns = [
     url(r'^displayFlights?$', views.displayFlights),
     url(r'^numpassenger?$', views.numPassenger),
     
-    url(r'^([0-9]{1})/$', views.displaySelectedFlight),
-    url(r'^([0-9]{2})/$', views.displaySelectedFlight),
-    url(r'^([0-9]{3})/$', views.displaySelectedFlight),
-    url(r'^([0-9]{4})/$', views.displaySelectedFlight),
-    url(r'^([0-9]{5})/$', views.displaySelectedFlight),
+    url(r'^([\w-]+)/$', views.displaySelectedFlight),
+    
     url(r'^passengerDetails/([0-9]{1})?$', views.PassengerDetails),
     url(r'^displayTicket?$', views.ticket),
     #url(r'^/?$', views.PassengerDetails),
