@@ -116,14 +116,14 @@ class Flights(models.Model):
 	price = models.CharField(max_length=10,blank=False)
 	arrivalTime = models.CharField(max_length=10,blank=False)
 	departureTime = models.CharField(max_length=10,blank=False)
-	seatsAvailable = models.IntegerField(default=180)
+	seatsAvailable = models.IntegerField(default=2)
 
 	class Meta:
 		unique_together = (("flightNum","date"))
 
 class Aircraft(models.Model):
 	modelNo = models.CharField(max_length=15,default="Airbus A320",blank=True)
-	capacity = models.IntegerField(blank=True,default=180)
+	capacity = models.IntegerField(blank=True,default=1)
 	registrationNumber = models.CharField(max_length=6,default=randint(1000,999999),blank=True,unique=True)
 
 class OperatedBy(models.Model):

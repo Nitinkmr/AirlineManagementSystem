@@ -40,6 +40,6 @@ class Flights(ModelForm):
 	
 class getNumPassengers(forms.Form):
 
-	choices = [(x,x) for x in range(1,5)]
+	choices = [(x,x) for x in range(1,200)]
 	numOfPassengers = forms.ChoiceField(choices)
 	

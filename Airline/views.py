@@ -21,13 +21,13 @@ def PassengerDetails(request,numPassengers):
 	#print request.method
 	if request.method == "POST":
 		form = PassengerForm(request.POST)
-		print "form"
-		print form.is_valid()
+		
+		
 
 		if form.is_valid():
 			formData = form.cleaned_data
 			request.session["phoneNumber"] = formData["PhoneNumber"]
-			print formData
+		
 			if 'passengerForm' not in request.session:
 				request.session["passengerForm"] = []
 				users = []
@@ -64,13 +64,16 @@ def FromAndTo(request):
 
 	if request.method == "POST":
 		form = SelectFlight(request.POST)
-		print "form"
-		print form.is_valid()
+		
+	
 		if form.is_valid():			
 			data = form.cleaned_data
 			FromAirport = data['origin']
 			ToAirport = data['destination']
 			Date = data['Date']
+
+			if FromAirport==ToAirport:
+				return render(request, 'displayFlights.html', {'form': '','error':'Origin and Destination can\'t be same'})
 			 
 			try:
 				request.session['origin'] = FromAirport
@@ -123,7 +126,7 @@ def displayFlights(request):
 			    "passengers": {
 			      "adultCount": 1
 			    },
-			    "solutions": 5,
+			    "solutions": 1,
 			    "refundable": False
 			  }
 			}
@@ -136,9 +139,9 @@ def displayFlights(request):
 
 		flights = data
 		flights = json.loads(flights)
-		print flights
+		
 		flights = flights["trips"]
-		print flights
+		
 		if 'tripOption' in flights:
 			flights = flights["tripOption"]	
 		else:
@@ -175,7 +178,7 @@ def displayFlights(request):
 	
 def displaySelectedFlight(request,flightNum):
 	#print flightNum
-	flight = Flights.objects.all().filter(flightNum=flightNum)
+	flight = Flights.objects.all().filter(flightNum=flightNum,date=request.session.get('date'))
 	result = {
 				"rate": flight[0].price,
 				"departureTime":flight[0].departureTime,
@@ -189,7 +192,10 @@ def ticket(request):
 
 	flightNum = request.session.get('flightNum')
 	passengerForm = request.session.get('passengerForm')
-	flight =  Flights.objects.all().filter(flightNum=flightNum)
+	flight =  Flights.objects.all().filter(flightNum=flightNum,date=request.session.get('date'))
+	print flight[0].flightNum
+	print flight[0].seatsAvailable
+	
 	pnr = get_random_string(length=6).upper()
 	
 	
@@ -204,11 +210,11 @@ def ticket(request):
 		form.save()
 		#passenger = Passenger.objects.all().filter(PhoneNumber=request.session.get("phoneNumber"))
 
-			#save booking# 
+		#save booking# 
 		form = Booking(PNR=newTicket)
 		form.save()
-		print "users in ticket"	
-		print users
+		
+
 		#save passenger#
 		for passenger in users:
 
@@ -221,6 +227,16 @@ def ticket(request):
 
 			newPassenger = Passenger(Email=email,PhoneNumber=phoneNumber,FirstName=firstName,LastName=lastName,Sex=sex,Age=age,pnrNo=newTicket)	
 			newPassenger.save()
+
+		
+		#flight[0].seatsAvailable = int(flight[0].seatsAvailable)-int(len(users))
+		flight.update(seatsAvailable = int(flight[0].seatsAvailable)-int(len(users)))
+		#flight[0].save()
+		#flight =  Flights.objects.all().filter(flightNum=flightNum,date=request.session.get('date'))
+		print flight[0].flightNum
+		print flight[0].seatsAvailable
+	
+		
 		global users	
 		users = []
 	
@@ -234,10 +250,20 @@ def numPassenger(request):
 
 	if request.method =="POST":
 		form = getNumPassengers(request.POST)
+		flightNum = request.session.get('flightNum')
 
+		flight = Flights.objects.all().filter(flightNum=flightNum,date=request.session.get('date'))
+		
+		seatsAvailable = flight[0].seatsAvailable
+		
 		if form.is_valid():
 			form = form.cleaned_data
 			request.session["numPassengers"] = form["numOfPassengers"]
+			
+			if int(seatsAvailable) == 0 or int(form["numOfPassengers"])>int(seatsAvailable):
+				return render(request, 'displayFlights.html', {'form':'','error':'required number of seats not available'})
+		
+
 			return HttpResponseRedirect('/airline/passengerDetails/' + request.session["numPassengers"])
 	else:
 		form = getNumPassengers()
