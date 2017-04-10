@@ -148,15 +148,12 @@ def displayFlights(request):
 			print "flights dont exist"			
 			return render(request, 'displayFlights.html', {'error': "no flights scheduled fot the given specification",'flights':''})
 		
-
-
-		#print flights
 		result = []
 		aircrafts = Aircraft.objects.all()
 		x = 0
 		for flight in flights:
 			temp = {
-					"rate": flight['saleTotal'],
+					"rate": flight['saleTotal'][3:],
 					"departureTime":flight['slice'][0]['segment'][0]['leg'][0]['departureTime'],
 					"arrivalTime":flight['slice'][0]['segment'][0]['leg'][0]['arrivalTime'],
 					"flightNum":flight['slice'][0]['segment'][0]['flight']['carrier'] + flight['slice'][0]['segment'][0]['flight']['number']
@@ -198,10 +195,15 @@ def ticket(request):
 	
 	pnr = get_random_string(length=6).upper()
 	
+	print flight[0].price
+	price = flight[0].price
+	print price
+	price = int(price)
+	price = price*len(users)
 	
 	try:
 		#save ticket#
-		newTicket = Ticket(PNR=pnr,price=flight[0].price)
+		newTicket = Ticket(PNR=pnr,price=price)
 		newTicket.save()
 
 		#save IssuedFor#
@@ -244,7 +246,7 @@ def ticket(request):
 		
 	except Exception as e:
 		print(e)
-	return render(request, 'displayTicket.html', {'flightNum': flightNum,'pnr':pnr,'price':flight[0].price})
+	return render(request, 'displayTicket.html', {'flightNum': flightNum,'pnr':pnr,'price':price})
 	
 def numPassenger(request):
 

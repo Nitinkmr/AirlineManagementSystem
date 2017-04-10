@@ -26,10 +26,12 @@ class SelectFlight(forms.Form):
 
 	Airports = get_airports()
 	choices = []
-	
+	temp = []
 	for Airport in Airports:
-		if Airport["country"] == "India" and Airport['name'] !='':
+		#if Airport["country"] == "India" and Airport['name'] !='':
 			choices.append((Airport['code'],Airport['name']))
+			temp.append({"code":Airport['code'],"name":Airport['name']})
+	print temp
 	#choices = [(Airport['iata'],Airport['name']) for Airport in Airports]
 	
 
